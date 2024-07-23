@@ -1,4 +1,7 @@
 {
   "name": "ExpoVideoTesting",
-  "displayName": "ExpoVideoTesting"
+  "displayName": "ExpoVideoTesting",
+  "plugins": [
+    "expo-video"
+  ]
 }

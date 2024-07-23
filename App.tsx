@@ -1,118 +1,82 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+// In App.js in a new project
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import * as React from 'react';
+import {Button, View, Text} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {useVideoPlayer, VideoPlayer, VideoView} from 'expo-video';
+import {MobXProviderContext, Provider} from 'mobx-react';
+import RootStore from './stores/RootStore';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const rootStore = RootStore.create();
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+function HomeScreen({navigation}) {
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>Home Screen</Text>
+
+      <Button
+        title="Go to Video Player"
+        onPress={() => navigation.navigate('Video Player')}
+      />
     </View>
   );
 }
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+function VideoPlayerScreen() {
+  const initialSource = {
+    uri: 'https://www.shutterstock.com/shutterstock/videos/6908191/preview/stock-footage-chimpanzee-eating-banana.mp4',
   };
 
+  const store = React.useContext(MobXProviderContext);
+
+  const videoPlayer: VideoPlayer = useVideoPlayer(
+    initialSource,
+    //  Setup function
+    (setupPlayer: VideoPlayer) => {
+      setupPlayer.loop = true;
+      setupPlayer.muted = false;
+      setupPlayer.playing = false;
+      setupPlayer.currentTime = 0;
+      setupPlayer.staysActiveInBackground = false;
+
+      // set the video player object in the store
+      store.rootStore.setVideoPlayerObj(setupPlayer);
+
+      // play the video after setup
+      setupPlayer.play();
+    },
+  );
+
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>Video Screen</Text>
+
+      <VideoView
+        player={videoPlayer}
+        style={{
+          width: 100,
+          height: 100,
+        }}
+        // allow native controls in debug mode / workout instructions
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+const Stack = createNativeStackNavigator();
+
+function App() {
+  return (
+    <Provider rootStore={rootStore} {...rootStore}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Video Player" component={VideoPlayerScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
+  );
+}
 
 export default App;
