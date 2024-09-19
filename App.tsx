@@ -11,9 +11,37 @@ import RootStore from './stores/RootStore';
 const rootStore = RootStore.create();
 
 function HomeScreen({navigation}) {
+  const initialSource = {
+    uri: 'https://www.shutterstock.com/shutterstock/videos/6908191/preview/stock-footage-chimpanzee-eating-banana.mp4',
+  };
+
+  const videoPlayer: VideoPlayer = useVideoPlayer(
+    initialSource,
+    //  Setup function
+    (setupPlayer: VideoPlayer) => {
+      setupPlayer.loop = true;
+      setupPlayer.muted = false;
+      setupPlayer.playing = false;
+      setupPlayer.currentTime = 0;
+      setupPlayer.staysActiveInBackground = false;
+
+      // play the video after setup
+      setupPlayer.play();
+    },
+  );
+
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Text>Home Screen</Text>
+
+      <VideoView
+        player={videoPlayer}
+        style={{
+          width: 100,
+          height: 100,
+        }}
+        // allow native controls in debug mode / workout instructions
+      />
 
       <Button
         title="Go to Video Player"
@@ -28,8 +56,6 @@ function VideoPlayerScreen() {
     uri: 'https://www.shutterstock.com/shutterstock/videos/6908191/preview/stock-footage-chimpanzee-eating-banana.mp4',
   };
 
-  const store = React.useContext(MobXProviderContext);
-
   const videoPlayer: VideoPlayer = useVideoPlayer(
     initialSource,
     //  Setup function
@@ -39,9 +65,6 @@ function VideoPlayerScreen() {
       setupPlayer.playing = false;
       setupPlayer.currentTime = 0;
       setupPlayer.staysActiveInBackground = false;
-
-      // set the video player object in the store
-      store.rootStore.setVideoPlayerObj(setupPlayer);
 
       // play the video after setup
       setupPlayer.play();

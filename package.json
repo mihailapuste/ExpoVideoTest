@@ -13,7 +13,7 @@
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.10.1",
     "expo": "^51.0.0",
-    "expo-video": "^1.2.3",
+    "expo-video": "^1.2.6",
     "mobx": "^6.13.1",
     "mobx-react": "^9.1.1",
     "mobx-state-tree": "^6.0.1",
@@ -42,5 +42,5 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "yarn@3.6.4"
+  "packageManager": "yarn@4.4.1"
 }
